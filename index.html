@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИКАЙ КЛИКЕР 9000 ULTIMATE EDITION</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: repeating-linear-gradient(45deg, #ff00ff, #00ff00 10px, #ff0000 10px, #0000ff 20px);
+            font-family: "Comic Sans MS", cursive;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: white;
+            text-shadow: 2px 2px black;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #clickArea {
+            margin: 20px auto;
+            width: min(300px, 80vw);
+            height: min(300px, 80vw);
+            background: rgba(255, 255, 0, 0.8);
+            border: 10px dashed lime;
+            border-radius: 50%;
+            cursor: pointer;
+            animation: spin 4s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+
+        #clickArea:active {
+            transform: scale(0.95);
+        }
+
+        #clickArea img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #score {
+            font-size: clamp(24px, 8vw, 48px);
+            color: white;
+            text-shadow: 2px 2px #ff0000, -2px -2px #00ff00, 2px -2px #0000ff, -2px 2px #ff00ff;
+            margin: 20px 0;
+        }
+
+        .upgrades-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .upgrade {
+            margin: 5px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.8);
+            border: 5px dotted magenta;
+            font-size: clamp(14px, 3vw, 18px);
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            border-radius: 15px;
+            color: black;
+            text-shadow: none;
+        }
+
+        .upgrade:hover {
+            transform: scale(1.05);
+            background: rgba(255, 0, 255, 0.8);
+            color: white;
+        }
+
+        .upgrade:active {
+            transform: scale(0.95);
+        }
+
+        .upgrade[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes spin {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 10px;
+            font-size: 16px;
+            color: #000;
+            text-shadow: none;
+            display: grid;
+            gap: 5px;
+        }
+
+        .blink {
+            animation: blink 1s linear infinite;
+        }
+
+        .bounce {
+            animation: bounce 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0% {opacity: 0.5;}
+            50% {opacity: 1;}
+            100% {opacity: 0.5;}
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #multiplierBonus {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 215, 0, 0.9);
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            color: black;
+            text-shadow: none;
+        }
+
+        .achievement {
+            background: rgba(255, 215, 0, 0.9);
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            display: none;
+            color: black;
+            text-shadow: none;
+        }
+
+        #achievementsContainer {
+            margin-top: 20px;
+            display: grid;
+            gap: 10px;
+        }
+
+        #prestige {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            display: none;
+            color: black;
+            text-shadow: none;
+        }
+
+        .special-offer {
+            background: linear-gradient(45deg, #ff0000, #ff6600);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #comboCounter {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 20px;
+            color: black;
+            text-shadow: none;
+        }
+
+        .powerup {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: float 3s ease-out forwards;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="particles"></div>
+        <h1 class="blink" style="color: #ff00ff; font-size: clamp(24px, 6vw, 48px); margin-bottom: 20px;">
+            ИКАЙ КЛИКЕР 9000 ULTIMATE!!!
+        </h1>
+        
+        <div class="stats">
+            <div id="score">0 ИКАЕВ</div>
+            <div id="clickPower">Сила клика: 1</div>
+            <div id="autoClickPower">Авто-клики: 0/сек</div>
+            <div id="prestigePoints">Очки престижа: 0</div>
+            <div id="totalClicks">Всего кликов: 0</div>
+        </div>
+
+        <div id="comboCounter">Комбо: x1</div>
+        <div id="multiplierBonus">x2 БОНУС!</div>
+        
+        <div id="clickArea">
+            <img src="https://i.ibb.co/G5Sw1ng/IMG-20250127-093638-901.jpg" alt="ИКАЙ">
+        </div>
+        
+        <div class="special-offer" id="specialOffer">
+            <h3>СУПЕР ПРЕДЛОЖЕНИЕ! 🌟</h3>
+            <p>Удвоенная мощность всех апгрейдов на 30 секунд!</p>
+            <button onclick="buySpecialOffer()" class="upgrade">
+                Купить за <span id="specialOfferCost">1000</span> икаев
+            </button>
+        </div>
+
+        <div class="upgrades-container">
+            <button class="upgrade" onclick="buyUpgrade('clicker')">
+                Икай-перчатка<br>
+                +1 к клику<br>
+                Уровень: <span id="clickerLevel">0</span><br>
+                Цена: <span id="clickerCost">10</span> икаев
+            </button>
+            
+            <button class="upgrade" onclick="buyUpgrade('autoClicker')">
+                Икай-генератор<br>
+                +1 икай/сек<br>
+                Уровень: <span id="autoClickerLevel">0</span><br>
+                Цена: <span id="autoClickerCost">25</span> икаев
+            </button>
+            
+            <button class="upgrade" onclick="buyUpgrade('multiplier')">
+                Икай-усилитель<br>
+                х1.5 множитель<br>
+                Уровень: <span id="multiplierLevel">0</span><br>
+                Цена: <span id="multiplierCost">50</span> икаев
+            </button>
+            
+            <button class="upgrade" onclick="buyUpgrade('autoClickBooster')">
+                Икай-ускоритель<br>
+                х1.5 к авто-кликам<br>
+                Уровень: <span id="autoClickBoosterLevel">0</span><br>
+                Цена: <span id="autoClickBoosterCost">100</span> икаев
+            </button>
+
+            <button class="upgrade" onclick="buyUpgrade('comboBooster')">
+                Икай-комбо<br>
+                Увеличивает бонус комбо<br>
+                Уровень: <span id="comboBoosterLevel">0</span><br>
+                Цена: <span id="comboBoosterCost">200</span> икаев
+            </button>
+
+            <button class="upgrade" onclick="buyUpgrade('criticalClick')">
+                Икай-крит<br>
+                Шанс крит. удара<br>
+                Уровень: <span id="criticalClickLevel">0</span><br>
+                Цена: <span id="criticalClickCost">500</span> икаев
+            </button>
+        </div>
+
+        <button id="prestige" onclick="prestige()">
+            ПРЕСТИЖ: +<span id="prestigeGain">0</span> очков престижа
+        </button>
+
+        <div id="achievementsContainer">
+            <!-- Достижения будут добавляться сюда динамически -->
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            score: 0,
+            clickPower: 1,
+            autoClickers: 0,
+            autoClickMultiplier: 1,
+            globalMultiplier: 1,
+            prestigePoints: 0,
+            totalClicks: 0,
+            combo: 1,
+            maxCombo: 1,
+            criticalChance: 0,
+            criticalMultiplier: 2,
+            lastClickTime: Date.now(),
+            costs: {
+                clicker: 10,
+                autoClicker: 25,
+                multiplier: 50,
+                autoClickBooster: 100,
+                comboBooster: 200,
+                criticalClick: 500
+            },
+            upgradeLevels: {
+                clicker: 0,
+                autoClicker: 0,
+                multiplier: 0,
+                autoClickBooster: 0,
+                comboBooster: 0,
+                criticalClick: 0
+            },
+            achievements: {
+                click100: { name: "Начинающий икатель", condition: () => game.totalClicks >= 100, achieved: false },
+                click1000: { name: "Продвинутый икатель", condition: () => game.totalClicks >= 1000, achieved: false },
+                score1m: { name: "Миллионер", condition: () => game.score >= 1000000, achieved: false },
+                combo50: { name: "Комбо-мастер", condition: () => game.maxCombo >= 50, achieved: false },
+                prestige1: { name: "Первый престиж", condition: () => game.prestigePoints >= 1, achieved: false }
+            }
+        };
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = Math.floor(game.score) + " ИКАЕВ";
+            document.getElementById('clickPower').textContent = 
+                `Сила клика: ${(game.clickPower * game.globalMultiplier).toFixed(1)}`;
+            document.getElementById('autoClickPower').textContent = 
+                `Авто-клики: ${(game.autoClickers * game.autoClickMultiplier * game.globalMultiplier).toFixed(1)}/сек`;
+            document.getElementById('prestigePoints').textContent = 
+                `Очки престижа: ${game.prestigePoints}`;
+            document.getElementById('totalClicks').textContent = 
+                `Всего кликов: ${game.totalClicks}`;
+            document.getElementById('comboCounter').textContent = 
+                `Комбо: x${game.combo.toFixed(1)}`;
+
+            // Обновляем уровни и цены улучшений
+            for (const [key, cost] of Object.entries(game.costs)) {
+                const costElement = document.getElementById(key + 'Cost');
+                const levelElement = document.getElementById(key + 'Level');
+                if (costElement) costElement.textContent = Math.floor(cost);
+                if (levelElement) levelElement.textContent = game.upgradeLevels[key];
+            }
+
+            // Проверяем возможность престижа
+            const prestigeGain = Math.floor(Math.sqrt(game.score / 1e6));
+            document.getElementById('prestige').style.display = prestigeGain > 0 ? 'block' : 'none';
+            document.getElementById('prestigeGain').textContent = prestigeGain;
+
+            // Проверяем специальное предложение
+            if (game.score >= 1000 && Math.random() < 0.1) {
+                document.getElementById('specialOffer').style.display = 'block';
+            }
+        }
+
+        function click(event) {
+            const now = Date.now();
+            const timeDiff = now - game.lastClickTime;
+            
+            // Обновляем комбо
+            if (timeDiff < 1000) {
+                game.combo = Math.min(game.combo + 0.1, 2 + game.upgradeLevels.comboBooster * 0.5);
+            } else {
+                game.combo = 1;
+            }
+            game.maxCombo = Math.max(game.maxCombo, game.combo);
+            game.lastClickTime = now;
+
+            // Проверяем критический удар
+            let criticalHit = Math.random() < (game.criticalChance + game.upgradeLevels.criticalClick * 0.05);
+            let multiplier = game.globalMultiplier * game.combo;
+            if (criticalHit) {
+                multiplier *= game.criticalMultiplier;
+                createPowerupText(event, 'КРИТ!', '#ff0000');
+            }
+
+            const gain = game.clickPower * multiplier;
+            game.score += gain;
+            game.totalClicks++;
+
+            createParticles(event);
+            createPowerupText(event, `+${Math.floor(gain)}`, '#ffff00');
+            checkAchievements();
+            updateDisplay();
+        }
+
+        function createPowerupText(event, text, color) {
+            const powerup = document.createElement('div');
+            powerup.className = 'powerup';
+            powerup.textContent = text;
+            powerup.style.color = color;
+            powerup.style.left = event.clientX + 'px';
+            powerup.style.top = event.clientY + 'px';
+            document.body.appendChild(powerup);
+            
+            setTimeout(() => {
+                powerup.remove();
+            }, 3000);
+        }
+
+        function buyUpgrade(type) {
+            const cost = game.costs[type];
+            if (game.score >= cost) {
+                game.score -= cost;
+                game.costs[type] = Math.ceil(cost * 1.5);
+                game.upgradeLevels[type]++;
+                
+                switch(type) {
+                    case 'clicker':
+                        game.clickPower += 1;
+                        break;
+                    case 'autoClicker':
+                        game.autoClickers += 1;
+                        break;
+                    case 'multiplier':
+                        game.globalMultiplier *= 1.5;
+                        break;
+                    case 'autoClickBooster':
+                        game.autoClickMultiplier *= 1.5;
+                        break;
+                    case 'comboBooster':
+                        // Эффект применяется через максимальное значение комбо
+                        break;
+                    case 'criticalClick':
+                        // Эффект применяется через шанс крита
+                        break;
+                }
+                
+                updateDisplay();
+            }
+        }
+
+        function buySpecialOffer() {
+            const cost = parseInt(document.getElementById('specialOfferCost').textContent);
+            if (game.score >= cost) {
+                game.score -= cost;
+                activateTemporaryBonus(30000, 2); // 30 секунд, x2 множитель
+                document.getElementById('specialOffer').style.display = 'none';
+            }
+        }
+
+        function createParticles(event) {
+            const particles = document.getElementById('particles');
+            const rect = document.getElementById('clickArea').getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const emojis = ['🌟', '⭐', '✨', '💫', '🎯', '🔥', '👆', '💪', '🎮'];
+            
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.position = 'fixed';
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.fontSize = '20px';
+                particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                const angle = (Math.PI * 2 * i) / 8;
+                const velocity = 8;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particles.appendChild(particle);
+                
+                let posX = centerX;
+                let posY = centerY;
+                let opacity = 1;
+                
+                const animate = () => {
+                    posX += vx;
+                    posY += vy;
+                    opacity -= 0.02;
+                    
+                    particle.style.left = posX + 'px';
+                    particle.style.top = posY + 'px';
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particles.removeChild(particle);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        }
+
+        function activateTemporaryBonus(duration, multiplier) {
+            const bonusElement = document.getElementById('multiplierBonus');
+            const oldMultiplier = game.globalMultiplier;
+            
+            game.globalMultiplier *= multiplier;
+            bonusElement.textContent = `x${multiplier} БОНУС!`;
+            bonusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                game.globalMultiplier = oldMultiplier;
+                bonusElement.style.display = 'none';
+                updateDisplay();
+            }, duration);
+        }
+
+        function prestige() {
+            const prestigeGain = Math.floor(Math.sqrt(game.score / 1e6));
+            if (prestigeGain > 0) {
+                game.prestigePoints += prestigeGain;
+                game.score = 0;
+                game.clickPower = 1 + game.prestigePoints;
+                game.autoClickers = 0;
+                game.autoClickMultiplier = 1;
+                game.globalMultiplier = 1 + game.prestigePoints * 0.1;
+                game.combo = 1;
+                
+                // Сбрасываем цены улучшений
+                game.costs = {
+                    clicker: 10,
+                    autoClicker: 25,
+                    multiplier: 50,
+                    autoClickBooster: 100,
+                    comboBooster: 200,
+                    criticalClick: 500
+                };
+                
+                // Сбрасываем уровни улучшений
+                for (let upgrade in game.upgradeLevels) {
+                    game.upgradeLevels[upgrade] = 0;
+                }
+                
+                updateDisplay();
+                checkAchievements();
+            }
+        }
+
+        function checkAchievements() {
+            for (const [id, achievement] of Object.entries(game.achievements)) {
+                if (!achievement.achieved && achievement.condition()) {
+                    achievement.achieved = true;
+                    showAchievement(achievement.name);
+                }
+            }
+        }
+
+        function showAchievement(name) {
+            const achievement = document.createElement('div');
+            achievement.className = 'achievement';
+            achievement.innerHTML = `🏆 Достижение разблокировано: ${name}!`;
+            achievement.style.display = 'block';
+            document.getElementById('achievementsContainer').appendChild(achievement);
+            
+            setTimeout(() => {
+                achievement.style.opacity = '0';
+                setTimeout(() => {
+                    achievement.remove();
+                }, 1000);
+            }, 5000);
+        }
+
+        // Автоматические клики
+        setInterval(() => {
+            game.score += game.autoClickers * game.autoClickMultiplier * game.globalMultiplier;
+            updateDisplay();
+        }, 1000);
+
+        // Случайные бонусы
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% шанс каждые 30 секунд
+                activateTemporaryBonus(10000, 2);
+            }
+        }, 30000);
+
+        // Инициализация игры
+        document.getElementById('clickArea').addEventListener('click', click);
+        updateDisplay();
+
+        // Сохранение и загрузка игры
+        function saveGame() {
+            localStorage.setItem('ikayClickerSave', JSON.stringify(game));
+        }
+
+        function loadGame() {
+            const save = localStorage.getItem('ikayClickerSave');
+            if (save) {
+                const loadedGame = JSON.parse(save);
+                Object.assign(game, loadedGame);
+                updateDisplay();
+            }
+        }
+
+        // Автосохранение каждые 30 секунд
+        setInterval(saveGame, 30000);
+
+        // Загружаем игру при запуске
+        loadGame();
+    </script>
+</body>
+</html>
